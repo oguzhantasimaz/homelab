@@ -73,6 +73,5 @@ table ip zapret_permanent {
 ```
 
 
-
-
-
+### Notes
+Bu proje eğitim amaçlıdır ve ağ güvenliği prensiplerini anlamak için oluşturulmuştur.
