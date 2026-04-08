@@ -28,15 +28,17 @@ sysctl -w net.bridge.bridge-nf-call-arptables=1
 
 
 Konteyner Ayrıcalıkları (/etc/pve/lxc/100.conf)
+
 Konteynerin ağ kartına tam erişimi için konfigürasyona şu satırları ekleyin:
 
-Plaintext
+```bash
 net0: name=eth0,bridge=vmbr0,firewall=0,ip=192.168.1.101/24,gw=192.168.1.1
 features: fuse=1,nesting=1
 unprivileged: 0
 lxc.apparmor.profile: unconfined
 lxc.cgroup.devices.allow: a
 lxc.cap.drop:
+```
 
 ## 🔌 2. Gateway LXC Yapılandırması
 
