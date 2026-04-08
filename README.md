@@ -9,7 +9,7 @@ Bu proje, bir Proxmox LXC konteyneri üzerinde **Zapret** (DPI Bypass) kullanara
 ## 🛠️ Donanım ve Ortam
 * **Anamakine:** Dell Laptop (Proxmox VE)
 * **Gateway:** Debian/Ubuntu LXC Container (ID: 100)
-* **İstemciler:** Windows 11 PC, iPhone 14 Pro
+* **İstemciler:** Windows 11 PC, iPhone 14 Pro, Macbook Pro M1 Pro  
 * **İnternet:** 1 Gbps Fiber (DPI Müdahaleli)
 
 ---
