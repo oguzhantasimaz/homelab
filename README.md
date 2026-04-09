@@ -533,12 +533,12 @@ pct set 104 --onboot 1 --startup order=5   # Immich
 
 ## 🔮 Gelecek Planlar
 
-- [ ] Ollama — GTX 1050 Ti ile lokal AI inference
 - [ ] Nginx Proxy Manager — Reverse proxy + SSL
 - [ ] Vaultwarden — Self-hosted şifre yöneticisi
 - [ ] Uptime Kuma — Servis monitoring
 - [ ] Watchtower — Docker auto-update
 - [ ] 5TB diski ext4'e format — exFAT sorunlarını kalıcı çözer
+- [ ] Expo benzeri android aab/apk builder servisi
 
 ---
 
