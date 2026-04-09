@@ -1,5 +1,7 @@
 # 🏠 Dell 7567 Proxmox Homelab
 
+> 🌐 **Türkçe** | [English](README.en.md)
+
 Eski bir Dell Inspiron 7567 gaming laptop'u tam teşekküllü bir ev sunucusuna dönüştürme rehberi. DPI bypass gateway, medya sunucusu, akıllı ev kontrolü, fotoğraf yedekleme, dosya yönetimi ve uzak erişim tek bir makinede.
 
 Özellikle Türkiye'deki servis sağlayıcıların (Superonline, Türk Telekom vb.) uyguladığı DPI engellerini (Discord, YouTube vb.) aşmak için optimize edilmiş bir Zapret gateway'i içerir.
