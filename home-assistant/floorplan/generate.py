@@ -88,9 +88,9 @@ def furniture():
     f.append(box(1182, 590, 30, 230, rx=14, fill="#445168", sw=0))
     f.append(box(880, 690, 170, 62, rx=16, fill="#323b47"))     # coffee table
     f.append(box(878, 880, 200, 20, rx=6, fill="#38414d"))      # tv unit
-    f.append(box(470, 736, 32, 80, rx=5, fill="#38414d"))       # bookshelf 1 (against the left wall)
-    f.append(box(470, 822, 32, 80, rx=5, fill="#38414d"))       # bookshelf 2
-    f += [f'<line x1="474" y1="{y}" x2="498" y2="{y}" stroke="#4b5563" stroke-width="2"/>' for y in (756, 776, 796, 842, 862, 882)]
+    f.append(box(472, 868, 92, 32, rx=5, fill="#38414d"))       # bookshelf 1 (bottom wall, same wall as the TV, bottom-left)
+    f.append(box(570, 868, 92, 32, rx=5, fill="#38414d"))       # bookshelf 2
+    f += [f'<line x1="{x}" y1="872" x2="{x}" y2="896" stroke="#4b5563" stroke-width="2"/>' for x in (503, 534, 601, 632)]
     f.append(box(488, 630, 80, 80, rx=24, fill="#3a4658"))      # armchair
     f.append(circle(1170, 500, 30, fill="#26402f", stroke="#2f5a3d"))
     f.append(circle(1170, 500, 14, fill="#2f6b44", stroke="none", sw=0))
