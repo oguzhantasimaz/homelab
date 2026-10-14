@@ -20,7 +20,7 @@ Requires Home Assistant 2024.8+ (sections view, tile features, `perform-action`)
 | View | Icon | What is on it |
 |------|------|---------------|
 | Ev | home | badges, greeting, weather, GLaDOS + app shortcuts, lights with brightness/colour-temp sliders, Hue scenes, Apple devices |
-| Sistem | server | Proxmox CPU/RAM gauges, graphs, VM/LXC status, disks |
+| Sistem | server | Proxmox CPU/RAM gauges, graphs, all 7 guests (VM 103, LXC 100-102, 104-106), storage |
 | Ağ | lan | Keenetic status, throughput, speedtest |
 | Medya | filmstrip | now playing, qBittorrent, Radarr/Sonarr |
 | Güvenlik | shield | CrowdSec decisions and alert trend |

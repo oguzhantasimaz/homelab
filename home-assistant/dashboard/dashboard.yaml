@@ -225,19 +225,22 @@ views:
           - type: heading
             heading: VM & LXC
             icon: mdi:cube-outline
-          - { type: tile, entity: binary_sensor.pve_vm_103_status,   name: HAOS (VM 103),   icon: mdi:home-assistant, color: green }   # EDIT
-          - { type: tile, entity: binary_sensor.pve_lxc_100_status,  name: Zapret (100),    icon: mdi:shield-lock,     color: green }   # EDIT
-          - { type: tile, entity: binary_sensor.pve_lxc_101_status,  name: Jellyfin (101),  icon: mdi:filmstrip,       color: green }   # EDIT
-          - { type: tile, entity: binary_sensor.pve_lxc_102_status,  name: Arr stack (102), icon: mdi:download,        color: green }   # EDIT
-          - { type: tile, entity: binary_sensor.pve_lxc_104_status,  name: Immich (104),    icon: mdi:image-multiple,  color: green }   # EDIT
+          # names/IDs from the Proxmox state in the main README (PVE 9.1.1, node pve)
+          - { type: tile, entity: binary_sensor.pve_vm_103_status,  name: HAOS (VM 103),            icon: mdi:home-assistant, color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_100_status, name: Zapret gateway (100),     icon: mdi:shield-lock,     color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_101_status, name: Jellyfin (101),           icon: mdi:filmstrip,       color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_102_status, name: Arr stack (102),          icon: mdi:download,        color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_104_status, name: Immich (104),             icon: mdi:image-multiple,  color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_105_status, name: Apps (105),               icon: mdi:docker,          color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_106_status, name: Gözcü crawler (106),      icon: mdi:spider-web,      color: green }   # EDIT
       - type: grid
         cards:
           - type: heading
             heading: Depolama
             icon: mdi:harddisk
-          - { type: tile, entity: sensor.pve_disk_used_percentage,  name: SSD 128 GB, icon: mdi:harddisk, features: [{ type: trend-graph }] }   # EDIT
-          - { type: tile, entity: sensor.onetb_used_percentage,     name: HDD 1 TB,   icon: mdi:harddisk }   # EDIT
-          - { type: tile, entity: sensor.fivetb_used_percentage,    name: USB 5 TB,   icon: mdi:harddisk }   # EDIT
+          - { type: tile, entity: sensor.pve_local_lvm_used_percentage, name: local-lvm · SSD 128 GB, icon: mdi:harddisk, features: [{ type: trend-graph }] }   # EDIT
+          - { type: tile, entity: sensor.pve_onetb_used_percentage,     name: onetb · HDD 1 TB,       icon: mdi:harddisk }   # EDIT
+          - { type: tile, entity: sensor.pve_fivetb_used_percentage,    name: fivetb · USB 5 TB (yedek), icon: mdi:harddisk-plus }   # EDIT
 
   # ───────────────────────── 3. AĞ (network / Keenetic) ─────────────────────────
   - title: Ağ
