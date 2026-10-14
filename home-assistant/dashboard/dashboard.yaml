@@ -227,28 +227,28 @@ views:
                 title: Mutfak
                 tap_action: { action: toggle }
                 hold_action: { action: more-info }
-                style: { top: "17.5%", left: "64.0%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
+                style: { top: "18.0%", left: "67.5%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
               - type: state-icon
                 entity: light.salon                 # EDIT
                 icon: mdi:lightbulb
                 title: Salon
                 tap_action: { action: toggle }
                 hold_action: { action: more-info }
-                style: { top: "48.9%", left: "48.1%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
+                style: { top: "50.4%", left: "50.7%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
               - type: state-icon
                 entity: light.yatak_odasi                 # EDIT
                 icon: mdi:lightbulb
                 title: Yatak odası
                 tap_action: { action: toggle }
                 hold_action: { action: more-info }
-                style: { top: "82.9%", left: "25.1%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
+                style: { top: "85.3%", left: "26.4%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
               - type: state-icon
                 entity: media_player.glados     # EDIT (or switch./remote.)
                 icon: mdi:television
                 title: Televizyon
                 tap_action: { action: toggle }
                 hold_action: { action: more-info }
-                style: { top: "62.3%", left: "73.3%", "--mdc-icon-size": "36px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
+                style: { top: "64.1%", left: "77.2%", "--mdc-icon-size": "36px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
       - type: grid
         cards:
           - type: heading
