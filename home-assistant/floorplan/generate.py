@@ -35,6 +35,8 @@ WINDOWS = [
 LAMPS = {"mutfak": (855, 245), "salon": (642, 686), "yatak": (223, 1162)}
 LABELS = {"mutfak": (855, 330), "salon": (642, 770), "yatak": (310, 1292)}
 TV = (978, 873)
+# rooms without a light: label only (dimmer pill)
+EXTRA_LABELS = {"depo": (167, 122), "tuvalet": (172, 482), "banyo": (192, 830), "ofis": (1020, 1262), "misafir": (655, 1285)}
 FLOOR = {"mutfak": "tile", "salon": "wood", "yatak": "wood"}
 
 BG, ROOM, WALL, WINDOW, DOOR, TEXT = "#12151a", "#1b2027", "#5b6472", "#58b0ff", "#ef6a5b", "#8b95a3"
@@ -94,6 +96,42 @@ def furniture():
     f.append(box(60, 1016, 50, 36, rx=8))
     f.append(box(60, 1270, 50, 36, rx=8))
     f.append(box(398, 1060, 38, 230, rx=8, fill="#38414d"))
+    # --- depo: shelves and boxes
+    f.append(box(66, 52, 206, 32, rx=6))
+    f.append(box(66, 84, 30, 168, rx=6))
+    f += [box(150, 168, 70, 52, rx=6, fill="#3a4658"), box(196, 214, 52, 40, rx=6, fill="#445168"), box(112, 210, 42, 42, rx=6, fill="#3a4658")]
+    # --- alaturka tuvalet: squat pan, small sink
+    f.append(box(112, 340, 76, 104, rx=16))
+    f.append(f'<ellipse cx="150" cy="410" rx="15" ry="28" fill="#14181d" stroke="{FURN_EDGE}" stroke-width="2.5"/>')
+    f += [box(122, 356, 24, 38, rx=6, fill="#3a4658"), box(154, 356, 24, 38, rx=6, fill="#3a4658")]
+    f.append(box(70, 292, 62, 44, rx=12))
+    f.append(circle(101, 314, 12, fill="#14181d"))
+    # --- banyo: shower cabin, toilet, sink, washing machine
+    f.append(box(62, 538, 134, 134, rx=10, fill="#1f3a4d", stroke="#2d5a78"))
+    f.append(circle(80, 556, 10, fill="#58b0ff", stroke="none", sw=0))
+    f.append(circle(150, 620, 11, fill="#14181d"))
+    f.append(box(262, 540, 62, 26, rx=8))
+    f.append(f'<ellipse cx="293" cy="596" rx="26" ry="34" fill="{FURN}" stroke="{FURN_EDGE}" stroke-width="2.5"/>')
+    f.append(box(60, 724, 56, 80, rx=10))
+    f.append(circle(88, 764, 18, fill="#14181d"))
+    f.append(box(62, 880, 86, 86, rx=10))
+    f.append(circle(105, 923, 28, fill="#14181d"))
+    f.append(circle(105, 923, 18, fill="#27313c", stroke="#3d4653"))
+    # --- ofis: desk, monitors, chair, shelf, plant
+    f.append(box(1126, 1022, 92, 214, rx=8))
+    f += [box(1138, 1052, 14, 64, rx=4, fill="#0f1318"), box(1138, 1140, 14, 64, rx=4, fill="#0f1318")]
+    f.append(circle(1066, 1128, 32, fill="#3a4658"))
+    f.append(box(878, 1004, 30, 250, rx=6, fill="#38414d"))
+    f.append(circle(1190, 958, 26, fill="#26402f", stroke="#2f5a3d"))
+    f.append(circle(1190, 958, 12, fill="#2f6b44", stroke="none", sw=0))
+    # --- misafir odasi: bed + desk
+    f.append(box(688, 1012, 148, 204, rx=14, fill="#3a4658"))
+    f.append(box(688, 1012, 148, 52, rx=14, fill="#4a586e"))
+    f.append(box(698, 1022, 60, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(766, 1022, 60, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(468, 1110, 72, 150, rx=8))
+    f.append(circle(578, 1185, 28, fill="#3a4658"))
+    f.append(box(474, 1130, 14, 54, rx=4, fill="#0f1318"))
     f.append('</g>')
     return "".join(f)
 
@@ -124,11 +162,13 @@ def base():
         out.append(swing(x1, y1, x2, y2))
     for x1, y1, x2, y2 in WINDOWS:
         out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="url(#glass)" stroke-width="9" stroke-linecap="round" filter="url(#wglow)"/>')
-    for name, (x, y) in LABELS.items():
-        t = name.upper()
-        wpx = len(t) * 22 + 34
-        out.append(f'<rect x="{x - wpx / 2}" y="{y - 24}" width="{wpx}" height="38" rx="19" fill="#0e1115" fill-opacity=".55" stroke="#2d3540" stroke-width="2"/>')
-        out.append(f'<text x="{x}" y="{y + 3}" text-anchor="middle" font-family="Inter,Segoe UI,Roboto,sans-serif" font-weight="600" font-size="22" letter-spacing="3.5" fill="{TEXT}">{t}</text>')
+    for labels, dim in ((LABELS, False), (EXTRA_LABELS, True)):
+        for name, (x, y) in labels.items():
+            t = {"tuvalet": "TUVALET", "misafir": "MİSAFİR", "ofis": "OFİS"}.get(name, name.upper())
+            size = 20 if dim else 22
+            wpx = len(t) * (size + 0) + 34
+            out.append(f'<rect x="{x - wpx / 2}" y="{y - 24}" width="{wpx}" height="38" rx="19" fill="#0e1115" fill-opacity="{.4 if dim else .55}" stroke="#2d3540" stroke-width="2"/>')
+            out.append(f'<text x="{x}" y="{y + 2}" text-anchor="middle" font-family="Inter,Segoe UI,Roboto,sans-serif" font-weight="600" font-size="{size}" letter-spacing="3" fill="{"#6f7987" if dim else TEXT}">{t}</text>')
     return svg("".join(out))
 
 
