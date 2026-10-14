@@ -31,49 +31,117 @@ WINDOWS = [
     (1227, 130, 1227, 375), (1223, 535, 1223, 850), (1233, 1070, 1233, 1185),
     (143, 1323, 327, 1323), (598, 1320, 760, 1320), (1005, 1320, 1145, 1320),
 ]
-# light name -> (x, y) of the lamp icon; also used for the room label
+# light name -> (x, y) of the lamp icon
 LAMPS = {"mutfak": (855, 245), "salon": (642, 686), "yatak": (223, 1162)}
+LABELS = {"mutfak": (855, 330), "salon": (642, 770), "yatak": (310, 1292)}
 TV = (978, 873)
+FLOOR = {"mutfak": "tile", "salon": "wood", "yatak": "wood"}
 
-BG, ROOM, WALL, WINDOW, DOOR, TEXT = "#14171c", "#1d2128", "#444b55", "#4aa3ff", "#e5534b", "#7d8794"
+BG, ROOM, WALL, WINDOW, DOOR, TEXT = "#12151a", "#1b2027", "#5b6472", "#58b0ff", "#ef6a5b", "#8b95a3"
+FURN, FURN_EDGE, FURN_SOFT = "#2c333d", "#3d4653", "#353d49"
+
+DEFS = f"""<defs>
+<pattern id="wood" width="60" height="1402" patternUnits="userSpaceOnUse"><rect width="60" height="1402" fill="#1f242b"/><line x1="0" y1="0" x2="0" y2="1402" stroke="#2a3038" stroke-width="2"/></pattern>
+<pattern id="tile" width="48" height="48" patternUnits="userSpaceOnUse"><rect width="48" height="48" fill="#1c222a"/><path d="M48 0H0V48" fill="none" stroke="#262d37" stroke-width="2"/></pattern>
+<pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill="#1d222a"/></pattern>
+<filter id="shadow" x="-5%" y="-5%" width="110%" height="110%"><feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#000" flood-opacity=".55"/></filter>
+<filter id="fshadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity=".45"/></filter>
+<filter id="wglow" filterUnits="userSpaceOnUse" x="0" y="0" width="1335" height="1402"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="glass" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1335" y2="1402"><stop offset="0" stop-color="#9fd3ff"/><stop offset="1" stop-color="#3b8fe6"/></linearGradient>
+<linearGradient id="vig" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".035"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient>
+</defs>"""
 
 
 def svg(body):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">{body}</svg>\n'
 
 
+def box(x, y, w, h, fill=FURN, rx=10, stroke=FURN_EDGE, sw=2.5, extra=""):
+    return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}" {extra}/>'
+
+
+def circle(cx, cy, r, fill=FURN_SOFT, stroke=FURN_EDGE, sw=2.5):
+    return f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>'
+
+
+def furniture():
+    f = ['<g filter="url(#fshadow)">']
+    # --- mutfak: counters, stove, sink, fridge, dining table
+    f.append(box(482, 54, 560, 62, rx=8))
+    f.append(box(482, 54, 62, 250, rx=8))
+    f += [circle(640 + dx, 85 + dy, 11) for dx in (0, 46) for dy in (0, 0)]
+    f += [circle(640 + dx, 85, 11) for dx in (92, 138)]
+    f.append(box(780, 66, 110, 40, rx=14, fill="#232a33"))  # sink
+    f.append(box(1110, 54, 98, 82, rx=8, fill="#38414d"))   # fridge
+    f.append(box(1010, 240, 150, 120, rx=18))                # dining table
+    f += [circle(1085 + dx, 232 if dy < 0 else 368, 17) for dx in (-45, 45) for dy in (-1, 1)]
+    # --- salon: rug, sofa, coffee table, tv unit, armchair, plant
+    f.append(box(790, 600, 380, 250, rx=26, fill="#242b35", stroke="#2f3744", extra='filter="none"'))
+    f.append(box(820, 612, 320, 92, rx=24, fill="#3a4658"))     # sofa
+    f.append(box(820, 612, 320, 30, rx=14, fill="#445168", sw=0))
+    f.append(box(808, 622, 34, 72, rx=14, fill="#445168"))
+    f.append(box(1120, 622, 34, 72, rx=14, fill="#445168"))
+    f.append(box(890, 740, 180, 62, rx=16, fill="#323b47"))     # coffee table
+    f.append(box(878, 880, 200, 20, rx=6, fill="#38414d"))      # tv unit
+    f.append(box(488, 490, 92, 92, rx=24, fill="#3a4658"))      # armchair
+    f.append(circle(1170, 500, 30, fill="#26402f", stroke="#2f5a3d"))
+    f.append(circle(1170, 500, 14, fill="#2f6b44", stroke="none", sw=0))
+    # --- yatak: bed, nightstands, wardrobe
+    f.append(box(60, 1058, 150, 206, rx=14, fill="#3a4658"))
+    f.append(box(60, 1058, 150, 52, rx=14, fill="#4a586e"))
+    f.append(box(72, 1068, 58, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(140, 1068, 58, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(60, 1016, 50, 36, rx=8))
+    f.append(box(60, 1270, 50, 36, rx=8))
+    f.append(box(398, 1060, 38, 230, rx=8, fill="#38414d"))
+    f.append('</g>')
+    return "".join(f)
+
+
 def swing(x1, y1, x2, y2):
-    """Quarter-circle door swing hinged at (x1, y1)."""
     r = max(abs(x2 - x1), abs(y2 - y1))
-    if x1 == x2:  # vertical wall, door swings right
-        return f'<path d="M{x1} {y1} h{r} A{r} {r} 0 0 1 {x1} {y1 + r}" fill="none" stroke="{DOOR}" stroke-width="3" stroke-dasharray="6 5" opacity=".7"/>'
-    return f'<path d="M{x1} {y1} v{r} A{r} {r} 0 0 0 {x1 + r} {y1}" fill="none" stroke="{DOOR}" stroke-width="3" stroke-dasharray="6 5" opacity=".7"/>'
+    if x1 == x2:
+        d = f"M{x1} {y1} h{r} A{r} {r} 0 0 1 {x1} {y1 + r}"
+    else:
+        d = f"M{x1} {y1} v{r} A{r} {r} 0 0 0 {x1 + r} {y1}"
+    return f'<path d="{d}" fill="none" stroke="{DOOR}" stroke-width="2.5" stroke-dasharray="5 6" opacity=".55"/>'
 
 
 def base():
-    out = [f'<rect width="{W}" height="{H}" rx="28" fill="{BG}"/>']
-    for _, x, y, w, h in ROOMS:
-        out.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="16" fill="{ROOM}" stroke="{WALL}" stroke-width="6"/>')
+    out = [DEFS, f'<rect width="{W}" height="{H}" rx="28" fill="{BG}"/><rect width="{W}" height="{H}" rx="28" fill="url(#dots)"/>']
+    out.append('<g filter="url(#shadow)">')
+    for name, x, y, w, h in ROOMS:
+        out.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="16" fill="{ROOM}" stroke="{WALL}" stroke-width="7"/>')
+    out.append("</g>")
+    for name, x, y, w, h in ROOMS:
+        fill = f"url(#{FLOOR[name]})" if name in FLOOR else ROOM
+        out.append(f'<rect x="{x + 3}" y="{y + 3}" width="{w - 6}" height="{h - 6}" rx="13" fill="{fill}"/>')
+        out.append(f'<rect x="{x + 3}" y="{y + 3}" width="{w - 6}" height="{h - 6}" rx="13" fill="url(#vig)"/>')
+    out.append(furniture())
     for x1, y1, x2, y2 in DOORS:
-        out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{ROOM}" stroke-width="12" stroke-linecap="butt"/>')
-        out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{DOOR}" stroke-width="4"/>')
+        out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{ROOM}" stroke-width="13"/>')
+        out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{DOOR}" stroke-width="4" stroke-linecap="round"/>')
         out.append(swing(x1, y1, x2, y2))
     for x1, y1, x2, y2 in WINDOWS:
-        out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{WINDOW}" stroke-width="8" stroke-linecap="round"/>')
-    for name, (x, y) in LAMPS.items():
-        out.append(f'<text x="{x}" y="{y + 78}" text-anchor="middle" font-family="sans-serif" font-size="30" letter-spacing="4" fill="{TEXT}">{name.upper()}</text>')
-    tx, ty = TV
-    out.append(f'<rect x="{tx - 90}" y="{ty + 18}" width="180" height="10" rx="5" fill="{WALL}"/>')
+        out.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="url(#glass)" stroke-width="9" stroke-linecap="round" filter="url(#wglow)"/>')
+    for name, (x, y) in LABELS.items():
+        t = name.upper()
+        wpx = len(t) * 22 + 34
+        out.append(f'<rect x="{x - wpx / 2}" y="{y - 24}" width="{wpx}" height="38" rx="19" fill="#0e1115" fill-opacity=".55" stroke="#2d3540" stroke-width="2"/>')
+        out.append(f'<text x="{x}" y="{y + 3}" text-anchor="middle" font-family="Inter,Segoe UI,Roboto,sans-serif" font-weight="600" font-size="22" letter-spacing="3.5" fill="{TEXT}">{t}</text>')
     return svg("".join(out))
 
 
 def glow(name):
     _, x, y, w, h = next(r for r in ROOMS if r[0] == name)
     cx, cy = LAMPS[name]
+    r = max(w, h) * 0.8
     return svg(
-        f'<defs><radialGradient id="g" gradientUnits="userSpaceOnUse" cx="{cx}" cy="{cy}" r="{max(w, h) * 0.75}">'
-        f'<stop offset="0" stop-color="#ffd166" stop-opacity=".55"/><stop offset="1" stop-color="#ffd166" stop-opacity=".12"/>'
-        f'</radialGradient></defs><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="16" fill="url(#g)"/>'
+        f'<defs><radialGradient id="g" gradientUnits="userSpaceOnUse" cx="{cx}" cy="{cy}" r="{r}">'
+        f'<stop offset="0" stop-color="#ffe29a" stop-opacity=".62"/><stop offset=".35" stop-color="#ffc857" stop-opacity=".30"/>'
+        f'<stop offset="1" stop-color="#ff9f1c" stop-opacity=".07"/></radialGradient></defs>'
+        f'<rect x="{x + 3}" y="{y + 3}" width="{w - 6}" height="{h - 6}" rx="13" fill="url(#g)" style="mix-blend-mode:screen"/>'
+        f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="16" fill="none" stroke="#ffd37a" stroke-opacity=".55" stroke-width="5"/>'
     )
 
 
