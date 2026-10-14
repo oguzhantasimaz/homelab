@@ -179,7 +179,88 @@ views:
           - { type: tile, entity: device_tracker.macbook_pro,      name: MacBook Pro,   icon: mdi:laptop,           grid_options: { columns: 12 } }   # EDIT
           - { type: tile, entity: sensor.macbook_pro_battery_level,name: MacBook şarj,  grid_options: { columns: 12 } }   # EDIT
 
-  # ───────────────────────── 2. SİSTEM (server / Proxmox) ─────────────────────────
+  # ───────────────────────── 2. PLAN (floor plan) ─────────────────────────
+  # Needs the SVGs from ../floorplan/ copied to /config/www/floorplan/ on HA.
+  - title: Plan
+    path: plan
+    icon: mdi:floor-plan
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: picture-elements
+            image: /local/floorplan/plan.svg
+            grid_options: { columns: full }
+            elements:
+              - type: image
+                entity: light.mutfak                 # EDIT
+                image: /local/floorplan/off.svg
+                state_image:
+                  "on": /local/floorplan/mutfak-on.svg
+                  "off": /local/floorplan/off.svg
+                tap_action: { action: none }
+                style: { top: 50%, left: 50%, width: 100%, pointer-events: none }
+              - type: image
+                entity: light.salon                 # EDIT
+                image: /local/floorplan/off.svg
+                state_image:
+                  "on": /local/floorplan/salon-on.svg
+                  "off": /local/floorplan/off.svg
+                tap_action: { action: none }
+                style: { top: 50%, left: 50%, width: 100%, pointer-events: none }
+              - type: image
+                entity: light.yatak_odasi                 # EDIT
+                image: /local/floorplan/off.svg
+                state_image:
+                  "on": /local/floorplan/yatak-on.svg
+                  "off": /local/floorplan/off.svg
+                tap_action: { action: none }
+                style: { top: 50%, left: 50%, width: 100%, pointer-events: none }
+              - type: state-icon
+                entity: light.mutfak                 # EDIT
+                icon: mdi:lightbulb
+                title: Mutfak
+                tap_action: { action: toggle }
+                hold_action: { action: more-info }
+                style: { top: "17.5%", left: "64.0%", "--mdc-icon-size": "46px" }
+              - type: state-icon
+                entity: light.salon                 # EDIT
+                icon: mdi:lightbulb
+                title: Salon
+                tap_action: { action: toggle }
+                hold_action: { action: more-info }
+                style: { top: "48.9%", left: "48.1%", "--mdc-icon-size": "46px" }
+              - type: state-icon
+                entity: light.yatak_odasi                 # EDIT
+                icon: mdi:lightbulb
+                title: Yatak odası
+                tap_action: { action: toggle }
+                hold_action: { action: more-info }
+                style: { top: "82.9%", left: "16.7%", "--mdc-icon-size": "46px" }
+              - type: state-icon
+                entity: media_player.glados     # EDIT (or switch./remote.)
+                icon: mdi:television
+                title: Televizyon
+                tap_action: { action: toggle }
+                hold_action: { action: more-info }
+                style: { top: "62.3%", left: "73.3%", "--mdc-icon-size": "40px" }
+      - type: grid
+        cards:
+          - type: heading
+            heading: Odalar
+            icon: mdi:floor-plan
+          - { type: tile, entity: light.mutfak,       name: Mutfak,       icon: mdi:countertop, features: [{ type: light-brightness }] }   # EDIT
+          - { type: tile, entity: light.salon,        name: Salon,        icon: mdi:sofa,       features: [{ type: light-brightness }] }   # EDIT
+          - { type: tile, entity: light.yatak_odasi,  name: Yatak odası,  icon: mdi:bed,        features: [{ type: light-brightness }] }   # EDIT
+          - { type: tile, entity: media_player.glados, name: Televizyon,  icon: mdi:television, tap_action: { action: toggle } }   # EDIT
+          - type: heading
+            heading: Kısayollar
+          - { type: tile, entity: script.hepsini_kapat, name: Hepsini kapat, icon: mdi:lightbulb-group-off, vertical: true, color: red,    grid_options: { columns: 6 }, tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.hepsini_kapat } } }   # EDIT
+          - { type: tile, entity: script.gece_modu,     name: Gece modu,     icon: mdi:weather-night,        vertical: true, color: indigo, grid_options: { columns: 6 }, tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.gece_modu } } }   # EDIT
+
+  # ───────────────────────── 3. SİSTEM (server / Proxmox) ─────────────────────────
   - title: Sistem
     path: sistem
     icon: mdi:server
@@ -242,7 +323,7 @@ views:
           - { type: tile, entity: sensor.pve_onetb_used_percentage,     name: onetb · HDD 1 TB,       icon: mdi:harddisk }   # EDIT
           - { type: tile, entity: sensor.pve_fivetb_used_percentage,    name: fivetb · USB 5 TB (yedek), icon: mdi:harddisk-plus }   # EDIT
 
-  # ───────────────────────── 3. AĞ (network / Keenetic) ─────────────────────────
+  # ───────────────────────── 4. AĞ (network / Keenetic) ─────────────────────────
   - title: Ağ
     path: ag
     icon: mdi:lan
@@ -273,7 +354,7 @@ views:
           - { type: tile, entity: sensor.speedtest_upload,   name: Yükleme, icon: mdi:upload }     # EDIT
           - { type: tile, entity: sensor.speedtest_ping,     name: Ping,    icon: mdi:timer-outline }   # EDIT
 
-  # ───────────────────────── 4. MEDYA (Jellyfin / *arr) ─────────────────────────
+  # ───────────────────────── 5. MEDYA (Jellyfin / *arr) ─────────────────────────
   - title: Medya
     path: medya
     icon: mdi:filmstrip
@@ -301,7 +382,7 @@ views:
           - { type: tile, entity: sensor.radarr_movies,          name: Radarr,        icon: mdi:movie }      # EDIT
           - { type: tile, entity: sensor.sonarr_series,          name: Sonarr,        icon: mdi:television-classic }   # EDIT
 
-  # ───────────────────────── 5. GÜVENLİK (CrowdSec / shield) ─────────────────────────
+  # ───────────────────────── 6. GÜVENLİK (CrowdSec / shield) ─────────────────────────
   - title: Güvenlik
     path: guvenlik
     icon: mdi:shield-check
@@ -338,7 +419,7 @@ views:
               Şu an aktif bir engel yok.
               {% endfor %}                            {# EDIT: attribute names depend on your CrowdSec integration #}
 
-  # ───────────────────────── 6. GELİR (RevenueCat) ─────────────────────────
+  # ───────────────────────── 7. GELİR (RevenueCat) ─────────────────────────
   - title: Gelir
     path: gelir
     icon: mdi:chart-areaspline
@@ -364,7 +445,7 @@ views:
             show: { fill: fade, icon: false }
             grid_options: { columns: full }
 
-  # ───────────────────────── 7. TRENDLER ─────────────────────────
+  # ───────────────────────── 8. TRENDLER ─────────────────────────
   - title: Trendler
     path: trendler
     icon: mdi:chart-line

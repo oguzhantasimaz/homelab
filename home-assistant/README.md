@@ -13,6 +13,14 @@ All entity IDs are placeholders (marked `# EDIT`) because HA is only reachable f
 3. ⋮ > Edit dashboard > ⋮ > Raw configuration editor, paste [`dashboard/dashboard.yaml`](dashboard/dashboard.yaml), Save.
 4. Replace every `# EDIT` entity. Developer tools > States has the real IDs. A broken ID shows a red "Entity not available" tile, which makes leftovers easy to spot.
 
+## Floor plan setup (Plan view)
+
+The Plan view draws your layout from the hand sketch (red = doors, blue = windows, 3 lamps, TV).
+
+1. Copy the `*.svg` files from [`floorplan/`](floorplan/) to `/config/www/floorplan/` on Home Assistant (File editor or Samba add-on; create the folder). They are then served as `/local/floorplan/...`.
+2. Do a hard refresh in the browser (Ctrl+F5) if the image doesn't show.
+3. To move walls, doors, windows or lamps, edit the coordinates at the top of [`floorplan/generate.py`](floorplan/generate.py), run `python3 generate.py` and copy the SVGs again. The lamp/TV icon positions in `dashboard.yaml` are percentages of the same canvas.
+
 Requires Home Assistant 2024.8+ (sections view, tile features, `perform-action`).
 
 ## Views
@@ -20,6 +28,7 @@ Requires Home Assistant 2024.8+ (sections view, tile features, `perform-action`)
 | View | Icon | What is on it |
 |------|------|---------------|
 | Ev | home | badges, greeting, weather, GLaDOS + app shortcuts, lights with brightness/colour-temp sliders, Hue scenes, Apple devices |
+| Plan | floor plan | your apartment as a floor plan: tap a lamp to toggle it, rooms glow when lit, TV icon, rooms/shortcuts panel |
 | Sistem | server | Proxmox CPU/RAM gauges, graphs, all 7 guests (VM 103, LXC 100-102, 104-106), storage |
 | Ağ | lan | Keenetic status, throughput, speedtest |
 | Medya | filmstrip | now playing, qBittorrent, Radarr/Sonarr |
