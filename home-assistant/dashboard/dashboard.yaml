@@ -1,0 +1,395 @@
+# Ev dashboard — Home Assistant "sections" layout
+# Paste into: Dashboard > ⋮ > Edit > ⋮ > Raw configuration editor
+# Entity IDs below are PLACEHOLDERS. Search for "# EDIT" and swap in yours
+# (Developer tools > States). See ../README.md for the full mapping table.
+#
+# HACS frontend cards used (everything else is core Home Assistant):
+#   - mini-graph-card   (sparklines, system/revenue trends)
+#   - apexcharts-card   (history charts)
+#   - card-mod          (optional polish; safe to remove the `card_mod` blocks)
+title: Ev
+views:
+
+  # ───────────────────────── 1. EV (home) ─────────────────────────
+  - title: Ev
+    path: ev
+    icon: mdi:home
+    type: sections
+    max_columns: 4
+    badges:
+      - type: entity
+        entity: person.oguzhan                # EDIT
+        show_name: true
+        show_state: true
+      - type: entity
+        entity: weather.home                  # EDIT
+        show_state: true
+      - type: entity
+        entity: binary_sensor.internet        # EDIT
+        name: İnternet
+        show_name: true
+        color: green
+      - type: entity
+        entity: update.home_assistant_core_update
+        name: HA güncellemesi
+        show_name: true
+        color: orange
+        visibility:
+          - condition: state
+            entity: update.home_assistant_core_update
+            state: "on"
+      - type: entity
+        entity: device_tracker.iphone         # EDIT
+        name: iPhone
+        show_name: true
+      - type: entity
+        entity: sensor.iphone_battery_level   # EDIT
+        name: iPhone şarj
+        show_name: true
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: markdown
+            grid_options: { columns: full }
+            content: |
+              {% set h = now().hour %}
+              # {{ 'Günaydın' if h < 12 else 'İyi günler' if h < 18 else 'İyi akşamlar' if h < 23 else 'İyi geceler' }}, Oğuzhan 👋
+              {{ states.light | selectattr('state','eq','on') | list | count }} ışık açık
+              · {{ states('sensor.living_room_temperature') | round(0) }}°C   {# EDIT #}
+          - type: weather-forecast
+            entity: weather.home              # EDIT
+            forecast_type: daily
+            show_current: true
+            show_forecast: true
+            grid_options: { columns: full }
+          - type: heading
+            heading: Salon · GLaDOS
+            icon: mdi:television
+          - type: tile
+            entity: media_player.glados       # EDIT (or switch./remote.)
+            name: GLaDOS
+            icon: mdi:television-ambient-light
+            grid_options: { columns: full }
+            tap_action: { action: toggle }
+          - type: tile
+            entity: script.open_youtube       # EDIT
+            name: YouTube
+            icon: mdi:youtube
+            vertical: true
+            grid_options: { columns: 6 }
+            tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.open_youtube } }
+          - type: tile
+            entity: script.open_netflix       # EDIT
+            name: Netflix
+            icon: mdi:netflix
+            vertical: true
+            grid_options: { columns: 6 }
+            tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.open_netflix } }
+          - type: tile
+            entity: script.open_jellyfin      # EDIT
+            name: Jellyfin
+            icon: mdi:filmstrip
+            vertical: true
+            grid_options: { columns: 6 }
+            tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.open_jellyfin } }
+          - type: tile
+            entity: script.open_spotify       # EDIT
+            name: Spotify
+            icon: mdi:spotify
+            vertical: true
+            grid_options: { columns: 6 }
+            tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.open_spotify } }
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Işıklar
+            icon: mdi:lightbulb-group
+          - type: tile
+            entity: light.yatak_odasi         # EDIT
+            name: Yatak odası
+            icon: mdi:bed
+            features_position: bottom
+            features:
+              - type: light-brightness
+              - type: light-color-temp
+          - type: tile
+            entity: light.salon               # EDIT
+            name: Salon
+            icon: mdi:sofa
+            features_position: bottom
+            features:
+              - type: light-brightness
+              - type: light-color-temp
+          - type: tile
+            entity: light.mutfak              # EDIT
+            name: Mutfak
+            icon: mdi:countertop
+            features_position: bottom
+            features:
+              - type: light-brightness
+              - type: light-color-temp
+          - type: tile
+            entity: script.hepsini_kapat      # EDIT
+            name: Hepsini kapat
+            icon: mdi:lightbulb-group-off
+            vertical: true
+            color: red
+            grid_options: { columns: 6 }
+            tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.hepsini_kapat } }
+          - type: tile
+            entity: script.gece_modu          # EDIT
+            name: Gece modu
+            icon: mdi:weather-night
+            vertical: true
+            color: indigo
+            grid_options: { columns: 6 }
+            tap_action: { action: perform-action, perform_action: script.turn_on, target: { entity_id: script.gece_modu } }
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Yatak odası sahneleri
+            icon: mdi:bed
+          # one tile per Hue scene — change entity + name, copy/paste more as needed
+          - { type: tile, entity: scene.yatak_odasi_relax,     name: Relax,     icon: mdi:sofa,                 vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.yatak_odasi_okuma,     name: Okuma,     icon: mdi:book-open-variant,    vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.yatak_odasi_dogal,     name: Doğal,     icon: mdi:white-balance-sunny,  vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.yatak_odasi_yildizlar, name: Yıldızlar, icon: mdi:star-shooting,       vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.yatak_odasi_gun_batimi,name: Gün batımı,icon: mdi:weather-sunset,       vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.yatak_odasi_gece,      name: Gece,      icon: mdi:moon-waning-crescent, vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - type: heading
+            heading: Salon sahneleri
+            icon: mdi:sofa
+          - { type: tile, entity: scene.salon_odak,     name: Odak,     icon: mdi:target,             vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.salon_enerji,   name: Enerji,   icon: mdi:flash,              vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.salon_relax,    name: Relax,    icon: mdi:sofa,               vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.salon_okuma,    name: Okuma,    icon: mdi:book-open-variant,  vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.salon_ruby,     name: Ruby,     icon: mdi:diamond-stone,      vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+          - { type: tile, entity: scene.salon_honolulu, name: Honolulu, icon: mdi:palm-tree,          vertical: true, grid_options: { columns: 4 }, tap_action: { action: toggle } }   # EDIT
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Apple & iCloud
+            icon: mdi:apple
+          - { type: tile, entity: device_tracker.iphone,           name: iPhone,        icon: mdi:cellphone,        grid_options: { columns: 12 } }   # EDIT
+          - { type: tile, entity: sensor.iphone_battery_level,     name: iPhone şarj,   grid_options: { columns: 12 }, features: [{ type: trend-graph }] }   # EDIT
+          - { type: tile, entity: device_tracker.macbook_pro,      name: MacBook Pro,   icon: mdi:laptop,           grid_options: { columns: 12 } }   # EDIT
+          - { type: tile, entity: sensor.macbook_pro_battery_level,name: MacBook şarj,  grid_options: { columns: 12 } }   # EDIT
+
+  # ───────────────────────── 2. SİSTEM (server / Proxmox) ─────────────────────────
+  - title: Sistem
+    path: sistem
+    icon: mdi:server
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Proxmox · pve
+            icon: mdi:server
+          - type: gauge
+            entity: sensor.pve_cpu_used          # EDIT
+            name: CPU
+            needle: true
+            severity: { green: 0, yellow: 60, red: 85 }
+            grid_options: { columns: 6 }
+          - type: gauge
+            entity: sensor.pve_memory_used_percentage   # EDIT
+            name: RAM
+            needle: true
+            severity: { green: 0, yellow: 70, red: 90 }
+            grid_options: { columns: 6 }
+          - type: custom:mini-graph-card
+            name: CPU · 24s
+            entities: [sensor.pve_cpu_used]      # EDIT
+            hours_to_show: 24
+            points_per_hour: 2
+            line_width: 3
+            show: { fill: fade, icon: false }
+            grid_options: { columns: full }
+          - type: custom:mini-graph-card
+            name: Sıcaklık · 24s
+            entities: [sensor.pve_cpu_temperature]   # EDIT
+            hours_to_show: 24
+            color_thresholds:
+              - { value: 0, color: "#4caf50" }
+              - { value: 70, color: "#ff9800" }
+              - { value: 85, color: "#f44336" }
+            grid_options: { columns: full }
+      - type: grid
+        cards:
+          - type: heading
+            heading: VM & LXC
+            icon: mdi:cube-outline
+          - { type: tile, entity: binary_sensor.pve_vm_103_status,   name: HAOS (VM 103),   icon: mdi:home-assistant, color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_100_status,  name: Zapret (100),    icon: mdi:shield-lock,     color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_101_status,  name: Jellyfin (101),  icon: mdi:filmstrip,       color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_102_status,  name: Arr stack (102), icon: mdi:download,        color: green }   # EDIT
+          - { type: tile, entity: binary_sensor.pve_lxc_104_status,  name: Immich (104),    icon: mdi:image-multiple,  color: green }   # EDIT
+      - type: grid
+        cards:
+          - type: heading
+            heading: Depolama
+            icon: mdi:harddisk
+          - { type: tile, entity: sensor.pve_disk_used_percentage,  name: SSD 128 GB, icon: mdi:harddisk, features: [{ type: trend-graph }] }   # EDIT
+          - { type: tile, entity: sensor.onetb_used_percentage,     name: HDD 1 TB,   icon: mdi:harddisk }   # EDIT
+          - { type: tile, entity: sensor.fivetb_used_percentage,    name: USB 5 TB,   icon: mdi:harddisk }   # EDIT
+
+  # ───────────────────────── 3. AĞ (network / Keenetic) ─────────────────────────
+  - title: Ağ
+    path: ag
+    icon: mdi:lan
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Keenetic Titan
+            icon: mdi:router-wireless
+          - { type: tile, entity: binary_sensor.internet,          name: İnternet,         color: green }   # EDIT
+          - { type: tile, entity: sensor.keenetic_wan_ip,          name: WAN IP }   # EDIT
+          - { type: tile, entity: sensor.keenetic_connected_devices, name: Bağlı cihazlar } # EDIT
+          - type: custom:mini-graph-card
+            name: İndirme / yükleme
+            entities: [sensor.keenetic_download, sensor.keenetic_upload]   # EDIT
+            hours_to_show: 6
+            line_width: 2
+            show: { legend: true, fill: fade }
+            grid_options: { columns: full }
+      - type: grid
+        cards:
+          - type: heading
+            heading: Hız testi
+            icon: mdi:speedometer
+          - { type: tile, entity: sensor.speedtest_download, name: İndirme, icon: mdi:download }   # EDIT
+          - { type: tile, entity: sensor.speedtest_upload,   name: Yükleme, icon: mdi:upload }     # EDIT
+          - { type: tile, entity: sensor.speedtest_ping,     name: Ping,    icon: mdi:timer-outline }   # EDIT
+
+  # ───────────────────────── 4. MEDYA (Jellyfin / *arr) ─────────────────────────
+  - title: Medya
+    path: medya
+    icon: mdi:filmstrip
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Şimdi oynuyor
+            icon: mdi:play-circle
+          - type: media-control
+            entity: media_player.jellyfin            # EDIT
+            grid_options: { columns: full }
+          - type: media-control
+            entity: media_player.spotify             # EDIT
+            grid_options: { columns: full }
+      - type: grid
+        cards:
+          - type: heading
+            heading: İndirmeler
+            icon: mdi:download
+          - { type: tile, entity: sensor.qbittorrent_down_speed, name: qBittorrent ↓, icon: mdi:download }   # EDIT
+          - { type: tile, entity: sensor.qbittorrent_up_speed,   name: qBittorrent ↑, icon: mdi:upload }     # EDIT
+          - { type: tile, entity: sensor.radarr_movies,          name: Radarr,        icon: mdi:movie }      # EDIT
+          - { type: tile, entity: sensor.sonarr_series,          name: Sonarr,        icon: mdi:television-classic }   # EDIT
+
+  # ───────────────────────── 5. GÜVENLİK (CrowdSec / shield) ─────────────────────────
+  - title: Güvenlik
+    path: guvenlik
+    icon: mdi:shield-check
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: CrowdSec
+            icon: mdi:owl
+          - { type: tile, entity: sensor.crowdsec_active_decisions, name: Aktif engeller,   icon: mdi:shield-off,   color: red }      # EDIT
+          - { type: tile, entity: sensor.crowdsec_alerts_24h,       name: Uyarı · 24s,      icon: mdi:alert,        color: orange }   # EDIT
+          - { type: tile, entity: sensor.crowdsec_machines,         name: Ajanlar,          icon: mdi:server-security }               # EDIT
+          - type: custom:mini-graph-card
+            name: Uyarılar · 7g
+            entities: [sensor.crowdsec_alerts_24h]   # EDIT
+            hours_to_show: 168
+            aggregate_func: max
+            group_by: hour
+            show: { fill: fade, icon: false }
+            grid_options: { columns: full }
+      - type: grid
+        cards:
+          - type: heading
+            heading: Son engellenen IP'ler
+            icon: mdi:ip-network
+          - type: markdown
+            grid_options: { columns: full }
+            content: |
+              {% for d in state_attr('sensor.crowdsec_active_decisions','decisions') or [] %}
+              - `{{ d.value }}` — {{ d.scenario }} ({{ d.origin }})
+              {% else %}
+              Şu an aktif bir engel yok.
+              {% endfor %}                            {# EDIT: attribute names depend on your CrowdSec integration #}
+
+  # ───────────────────────── 6. GELİR (RevenueCat) ─────────────────────────
+  - title: Gelir
+    path: gelir
+    icon: mdi:chart-areaspline
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: RevenueCat
+            icon: mdi:cash-multiple
+          - { type: tile, entity: sensor.revenuecat_mrr,                 name: MRR,          icon: mdi:cash-multiple }   # EDIT
+          - { type: tile, entity: sensor.revenuecat_revenue,             name: Gelir (28g),  icon: mdi:cash }            # EDIT
+          - { type: tile, entity: sensor.revenuecat_active_subscribers,  name: Aboneler,     icon: mdi:account-group }    # EDIT
+          - { type: tile, entity: sensor.revenuecat_active_trials,       name: Denemeler,    icon: mdi:timer-sand }       # EDIT
+          - type: custom:mini-graph-card
+            name: MRR · 30g
+            entities: [sensor.revenuecat_mrr]        # EDIT
+            hours_to_show: 720
+            group_by: day
+            aggregate_func: last
+            line_width: 3
+            show: { fill: fade, icon: false }
+            grid_options: { columns: full }
+
+  # ───────────────────────── 7. TRENDLER ─────────────────────────
+  - title: Trendler
+    path: trendler
+    icon: mdi:chart-line
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sıcaklık & nem
+            icon: mdi:thermometer
+          - type: custom:apexcharts-card
+            header: { show: true, title: Salon sıcaklığı, show_states: true }
+            graph_span: 3d
+            span: { start: day, offset: "-2d" }
+            series:
+              - entity: sensor.living_room_temperature   # EDIT
+                type: area
+                stroke_width: 2
+            grid_options: { columns: full }
+      - type: grid
+        cards:
+          - type: heading
+            heading: Pil seviyeleri
+            icon: mdi:battery
+          - type: history-graph
+            hours_to_show: 48
+            entities:
+              - entity: sensor.iphone_battery_level          # EDIT
+              - entity: sensor.macbook_pro_battery_level     # EDIT
+            grid_options: { columns: full }
