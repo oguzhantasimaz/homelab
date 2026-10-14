@@ -14,12 +14,13 @@ Includes a Zapret gateway optimized to bypass DPI blocks (Discord, YouTube, etc.
 | **CPU** | Intel Core i7-7700HQ (4C/8T @ 2.80GHz) |
 | **RAM** | 16GB DDR4 |
 | **iGPU** | Intel HD Graphics 630 (Jellyfin VAAPI) |
-| **dGPU** | NVIDIA GTX 1050 Ti Mobile (future Ollama use) |
+| **dGPU** | NVIDIA GTX 1050 Ti Mobile (device nodes bound into Jellyfin LXC 101; Ollama planned) |
 | **Webcam** | Realtek Integrated Webcam (0bda:568a) |
-| **SSD** | 128GB (Proxmox OS + LVM) |
-| **HDD** | 1TB ext4 (media + Immich storage) |
-| **USB HDD** | 5TB exFAT (general storage / file management) |
+| **SSD** | 128GB SanDisk X400 (Proxmox OS + LVM) |
+| **HDD** | 1TB ext4 (VM/LXC disks, incomplete downloads) |
+| **USB HDD** | 5TB ext4 (media, Immich, backups, general storage) |
 | **Ethernet** | USB Ethernet Adapter (100Mbps negotiated) |
+| **Hypervisor** | Proxmox VE 9.1.1 (kernel 6.17.2-1-pve) |
 | **Router** | Keenetic Titan (PPPoE) |
 | **ISP** | Superonline Fiber |
 
@@ -32,29 +33,29 @@ Includes a Zapret gateway optimized to bypass DPI blocks (Discord, YouTube, etc.
 ## 🏗️ Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                     Proxmox VE Host                          │
-│                192.168.1.100 (vmbr0)                         │
-│           Tailscale (subnet router, 192.168.1.0/24)          │
-│           Filebrowser (:8085 → 5TB exFAT)                    │
-│                                                              │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────────┐  │
-│  │ LXC 100  │ │ LXC 101  │ │ LXC 102  │ │ LXC 104 (priv) │  │
-│  │ Zapret   │ │ Jellyfin │ │ Arr Stack│ │    Immich       │  │
-│  │ Gateway  │ │  + iGPU  │ │ + Docker │ │  + Photo        │  │
-│  │ unpriv   │ │  VAAPI   │ │          │ │    Backup       │  │
-│  │ .101     │ │ .102     │ │ .103     │ │    .105         │  │
-│  └──────────┘ └──────────┘ └──────────┘ └────────────────┘  │
-│                                                              │
-│  ┌───────────┐                                               │
-│  │  VM 103   │  Storage:                                     │
-│  │   HAOS    │  ├── /dev/sda (128GB SSD) → pve LVM           │
-│  │  Home     │  ├── /dev/sdb (1TB HDD)  → /mnt/pve/onetb    │
-│  │ Assistant │  └── /dev/sdc (5TB USB)  → /mnt/pve/5tb      │
-│  │  + Webcam │                                               │
-│  │  .142     │                                               │
-│  └───────────┘                                               │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          Proxmox VE Host (pve)                           │
+│                          192.168.1.100 (vmbr0)                           │
+│                Tailscale (subnet router, 192.168.1.0/24)                 │
+│                      Filebrowser (:8085 → 5TB ext4)                      │
+│                                                                          │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
+│  │ LXC 100 │ │ LXC 101 │ │ LXC 102 │ │ LXC 104 │ │ LXC 105 │ │ LXC 106 │ │
+│  │  Zapret │ │ Jellyfin│ │Arr Stack│ │  Immich │ │   Apps  │ │  Gozcu  │ │
+│  │ Gateway │ │  + GPU  │ │ + Docker│ │ + Photos│ │ + Docker│ │ crawler │ │
+│  │   priv  │ │  unpriv │ │  unpriv │ │   priv  │ │  unpriv │ │  unpriv │ │
+│  │   .101  │ │   .102  │ │   .103  │ │   .105  │ │   .108  │ │   .106  │ │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │
+│                                                                          │
+│  ┌───────────┐                                                           │
+│  │   VM 103  │  Storage:                                                 │
+│  │    HAOS   │  ├── /dev/sda (128GB SSD) → pve LVM                       │
+│  │    Home   │  ├── /dev/sdb (1TB HDD)  → /mnt/pve/onetb                 │
+│  │ Assistant │  └── /dev/sdc (5TB USB)  → /mnt/pve/5tb                   │
+│  │  + Webcam │                                                           │
+│  │    .142   │                                                           │
+│  └───────────┘                                                           │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 🔧 Services
@@ -62,7 +63,7 @@ Includes a Zapret gateway optimized to bypass DPI blocks (Discord, YouTube, etc.
 | Service | Location | Port | Description |
 |---------|----------|------|-------------|
 | **Proxmox** | Host | 8006 | Hypervisor management |
-| **Filebrowser** | Host | 8085 | Web file manager (5TB exFAT) |
+| **Filebrowser** | Host | 8085 | Web file manager (5TB ext4) |
 | **Tailscale** | Host | - | VPN / remote access |
 | **Zapret** | LXC 100 | - | DPI bypass gateway |
 | **Jellyfin** | LXC 101 | 8096 | Media server (VAAPI HW transcoding) |
@@ -77,6 +78,75 @@ Includes a Zapret gateway optimized to bypass DPI blocks (Discord, YouTube, etc.
 | **Immich** | LXC 104 | 2283 | Self-hosted Google Photos |
 | **Home Assistant** | VM 103 | 8123 | Smart home control (Hue, Keenetic) |
 | **go2rtc** | VM 103 | 8554 | Webcam streaming |
+| **Apps (Docker)** | LXC 105 | - | General Docker host (contents not inventoried yet) |
+| **Gözcü crawler** | LXC 106 | - | Amazon TR crawler (Docker, `pnpm crawler:daemon`) |
+
+## 🖥️ Current Proxmox State
+
+> Read from the Proxmox API on 2026-10-14 (read-only). The step-by-step guide below is how each piece was built; this section is what is actually running now, so check it first when the two differ.
+
+### Host
+
+| Item | Value |
+|------|-------|
+| **Node** | `pve` (single node) |
+| **Proxmox VE** | 9.1.1 |
+| **Kernel** | 6.17.2-1-pve |
+| **CPU** | Intel Core i7-7700HQ, 1 socket, 4 cores / 8 threads |
+| **RAM / swap** | 16GB / 8GB |
+| **Network** | `vmbr0` 192.168.1.100/24, gateway 192.168.1.1, bridged on `nic0` (USB Ethernet). `nic1` and `wlp3s0` are unused |
+| **DNS** | Tailscale MagicDNS (100.100.100.100) |
+
+### Storage
+
+| Name | Type | Path / backing | Content | Size | Used |
+|------|------|----------------|---------|------|------|
+| `local` | dir | `/var/lib/vz` | import | 56GB | 7GB (12%) |
+| `local-lvm` | LVM-thin | VG `pve`, pool `data` | VM/LXC disks | 58GB | 29GB (50%) |
+| `onetb` | dir | `/mnt/pve/onetb` | VM/LXC disks, backups, templates, ISOs, snippets | 983GB | 482GB (49%) |
+| `fivetb` | dir | `/mnt/pve/5tb/dump` | backups (keep last 2) | 4.96TB | 1.01TB (20%) |
+
+| Disk | Model | Type | Filesystem | SMART |
+|------|-------|------|------------|-------|
+| `/dev/sda` | SanDisk X400 M.2 128GB | SSD | Proxmox OS + LVM | PASSED |
+| `/dev/sdb` | WDC WD10JPVX 1TB | HDD | ext4 (`onetb`) | PASSED |
+| `/dev/sdc` | One Touch 5TB (USB) | USB HDD | ext4 (`/mnt/pve/5tb`) | unknown over USB |
+
+### Guests
+
+All seven guests were running and set to start on boot.
+
+| ID | Type | Name | IP | CPU / RAM / swap | Root disk | Privilege | Start order |
+|----|------|------|----|------------------|-----------|-----------|-------------|
+| 100 | LXC | `gateway` (Zapret) | 192.168.1.101 | 1 / 512MB / 1GB | 8GB `local-lvm` | privileged | 1 |
+| 101 | LXC | `jellyfin` | 192.168.1.102 | 4 / 2GB / 2GB | 30GB `local-lvm` | unprivileged | 2 |
+| 102 | LXC | `arr-stack` | 192.168.1.103 | 2 / 3GB / 2GB | 20GB `local-lvm` | unprivileged | 3 |
+| 103 | VM | `haos-17.2` | 192.168.1.142 | 2 / 4GB | 32GB `onetb` (q35, OVMF) | n/a | none set |
+| 104 | LXC | `immich` | 192.168.1.105 | 4 / 4GB / 2GB | 20GB `local-lvm` | privileged | 5 |
+| 105 | LXC | `apps` | 192.168.1.108 | 2 / 2GB / 512MB | 12GB `local-lvm` | unprivileged | none set |
+| 106 | LXC | `gozcu-crawler` | 192.168.1.106 (DHCP) | 4 / 4GB / 512MB | 16GB `onetb` | unprivileged | none set |
+
+### Bind mounts and passthrough
+
+| Guest | Host path → guest path |
+|-------|------------------------|
+| LXC 101 | `/mnt/pve/5tb/media` → `/media` |
+| LXC 102 | `/mnt/pve/5tb/media` → `/media`, `/mnt/pve/5tb` → `/storage`, `/mnt/pve/onetb/incomplete-downloads` → `/incomplete` |
+| LXC 104 | `/mnt/pve/5tb` → `/storage`, `/mnt/pve/5tb/immich` → `/immich-data` |
+
+- **LXC 101** gets `/dev/dri/card1` and `/dev/dri/renderD129` (Intel iGPU, VAAPI), the NVIDIA device nodes (`/dev/nvidia0`, `nvidiactl`, `nvidia-uvm`, `nvidia-uvm-tools`) and a hookscript, `jellyfin-gpu.sh`.
+- **VM 103** gets the USB webcam `0bda:568a`.
+
+### What changed since the last README update
+
+- The 5TB USB drive is now **ext4** (it was exFAT). Media and Immich data now live on it (the old guide had them on the 1TB drive), and a `fivetb` backup storage exists.
+- Two new containers: **LXC 105 `apps`** and **LXC 106 `gozcu-crawler`**.
+- Memory, swap and disk sizes of LXC 101, 102 and 104 differ from the original `pct create` commands below (current values are in the table above).
+- Jellyfin's iGPU render node is now `renderD129` (it was `renderD128`), and the GTX 1050 Ti device nodes are bound in.
+- LXC 100 is privileged (`unprivileged: 0`), as its config block below already said; the old diagram said otherwise.
+- The host runs Proxmox VE 9.1.1 (kernel 6.17.2).
+
+---
 
 ## 📦 Setup Steps
 
@@ -109,26 +179,26 @@ sysctl -w net.bridge.bridge-nf-call-arptables=1
 #### Disk mounts
 
 ```bash
-# 1TB HDD (media) - ext4, added via Proxmox GUI
+# 1TB HDD - ext4, added via Proxmox GUI (VM 103 disk, LXC 106 root disk, incomplete downloads)
 # /mnt/pve/onetb
 
-# 5TB USB HDD (exFAT — requires custom mount)
-mkdir -p /mnt/pve/5tb
-mount -t exfat -o rw,uid=0,gid=0,dmask=000,fmask=000 /dev/sdc1 /mnt/pve/5tb
-echo "/dev/sdc1 /mnt/pve/5tb exfat rw,uid=0,gid=0,dmask=000,fmask=000,nofail 0 0" >> /etc/fstab
+# 5TB USB HDD - ext4 (it was exFAT before being reformatted), mounted at /mnt/pve/5tb
+# Backups go to /mnt/pve/5tb/dump (Proxmox storage "fivetb")
 
-# Media folder structure
-mkdir -p /mnt/pve/onetb/media/{movies,tv,downloads}
-chmod -R 777 /mnt/pve/onetb/media
+# Media folder structure (5TB)
+mkdir -p /mnt/pve/5tb/media/{movies,tv,downloads}
+chmod -R 777 /mnt/pve/5tb/media
 
-# Immich storage (1TB HDD, ext4)
-mkdir -p /mnt/pve/onetb/immich/{encoded-video,library,thumbs,profile,upload,backups}
-chown -R 100000:100000 /mnt/pve/onetb/immich
-chmod -R 777 /mnt/pve/onetb/immich
+# Immich storage (5TB, ext4)
+mkdir -p /mnt/pve/5tb/immich/{encoded-video,library,thumbs,profile,upload,backups}
+chown -R 100000:100000 /mnt/pve/5tb/immich
+chmod -R 777 /mnt/pve/5tb/immich
 ```
 
 #### Filebrowser (on the Host)
 
+> **Update:** the 5TB drive is now ext4 (see Current Proxmox State), so the exFAT limitation below no longer applies. Whether Filebrowser still runs on the host is not visible through the Proxmox API.
+>
 > **Why on the host?** The exFAT filesystem does not support the Linux permission model. LXC bind mounts cannot grant write access to exFAT — even in a privileged container. Running directly on the host is the only reliable approach.
 
 ```bash
@@ -210,8 +280,8 @@ table ip zapret_permanent {
 
 ```bash
 pct create 101 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
-  --hostname jellyfin --memory 2048 --swap 512 --cores 4 \
-  --rootfs local-lvm:20 \
+  --hostname jellyfin --memory 2048 --swap 2048 --cores 4 \
+  --rootfs local-lvm:30 \
   --net0 name=eth0,bridge=vmbr0,ip=192.168.1.102/24,gw=192.168.1.1 \
   --unprivileged 1 --features nesting=1 --start 0
 ```
@@ -219,16 +289,23 @@ pct create 101 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
 #### iGPU Passthrough (`/etc/pve/lxc/101.conf`)
 
 ```
+hookscript: local:snippets/jellyfin-gpu.sh
 lxc.cgroup2.devices.allow: c 226:1 rwm
-lxc.cgroup2.devices.allow: c 226:128 rwm
+lxc.cgroup2.devices.allow: c 226:129 rwm
+lxc.cgroup2.devices.allow: c 195:* rwm
+lxc.cgroup2.devices.allow: c 506:* rwm
 lxc.mount.entry: /dev/dri/card1 dev/dri/card1 none bind,optional,create=file
-lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
+lxc.mount.entry: /dev/dri/renderD129 dev/dri/renderD129 none bind,optional,create=file
+lxc.mount.entry: /dev/nvidia0 dev/nvidia0 none bind,optional,create=file
+lxc.mount.entry: /dev/nvidiactl dev/nvidiactl none bind,optional,create=file
+lxc.mount.entry: /dev/nvidia-uvm dev/nvidia-uvm none bind,optional,create=file
+lxc.mount.entry: /dev/nvidia-uvm-tools dev/nvidia-uvm-tools none bind,optional,create=file
 ```
 
 #### Mount & Install
 
 ```bash
-pct set 101 -mp0 /mnt/pve/onetb/media,mp=/media
+pct set 101 -mp0 /mnt/pve/5tb/media,mp=/media
 
 # Inside LXC
 apt update && apt install -y curl gnupg
@@ -241,7 +318,7 @@ systemctl enable --now jellyfin
 #### VAAPI Transcoding
 
 Dashboard → Playback → Transcoding:
-- Hardware acceleration: **VAAPI** → Device: `/dev/dri/renderD128`
+- Hardware acceleration: **VAAPI** → Device: `/dev/dri/renderD129`
 - Enable H264, HEVC, MPEG2, VP9, VC1, HEVC 10bit, VP9 10bit
 
 ---
@@ -252,12 +329,14 @@ Dashboard → Playback → Transcoding:
 
 ```bash
 pct create 102 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
-  --hostname arr-stack --memory 2048 --swap 512 --cores 2 \
-  --rootfs local-lvm:10 \
+  --hostname arr-stack --memory 3072 --swap 2048 --cores 2 \
+  --rootfs local-lvm:20 \
   --net0 name=eth0,bridge=vmbr0,ip=192.168.1.103/24,gw=192.168.1.1 \
   --unprivileged 1 --features nesting=1 --start 0
 
-pct set 102 -mp0 /mnt/pve/onetb/media,mp=/media
+pct set 102 -mp0 /mnt/pve/5tb/media,mp=/media
+pct set 102 -mp1 /mnt/pve/5tb,mp=/storage
+pct set 102 -mp2 /mnt/pve/onetb/incomplete-downloads,mp=/incomplete
 ```
 
 #### Install Docker
@@ -403,17 +482,17 @@ Jellyseerr (request) → Radarr/Sonarr → Prowlarr (indexer)
 
 ### 5. LXC 104 — Immich (Self-hosted Google Photos)
 
-> **Privileged container** — required so Docker can write to the 1TB HDD mount.
+> **Privileged container** — required so Docker can write to the host mounts.
 
 ```bash
 pct create 104 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
-  --hostname immich --memory 4096 --swap 1024 --cores 4 \
+  --hostname immich --memory 4096 --swap 2048 --cores 4 \
   --rootfs local-lvm:20 \
   --net0 name=eth0,bridge=vmbr0,ip=192.168.1.105/24,gw=192.168.1.1 \
   --unprivileged 0 --features nesting=1 --start 0
 
 pct set 104 -mp0 /mnt/pve/5tb,mp=/storage
-pct set 104 -mp1 /mnt/pve/onetb/immich,mp=/immich-data
+pct set 104 -mp1 /mnt/pve/5tb/immich,mp=/immich-data
 ```
 
 #### Install (inside LXC)
@@ -454,6 +533,8 @@ bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/Proxm
 qm set 103 -usb0 host=0bda:568a
 ```
 
+Current VM settings: 2 cores, 4GB RAM, 32GB disk on `onetb` (q35, OVMF/UEFI), QEMU guest agent enabled, tag `community-script`.
+
 #### go2rtc (Webcam)
 
 Add-on repo: `https://github.com/AlexxIT/hassio-addons` → Install go2rtc:
@@ -472,7 +553,44 @@ streams:
 
 ---
 
-### 7. Tailscale
+### 7. LXC 105 — Apps (Docker)
+
+General-purpose Docker container. What runs inside is not recorded here yet.
+
+```
+hostname: apps
+cores: 2
+memory: 2048
+swap: 512
+rootfs: local-lvm:vm-105-disk-0,size=12G
+net0: name=eth0,bridge=vmbr0,gw=192.168.1.1,ip=192.168.1.108/24,type=veth
+nameserver: 1.1.1.1
+features: nesting=1,keyctl=1
+unprivileged: 1
+onboot: 1
+```
+
+---
+
+### 8. LXC 106 — Gözcü Crawler (Docker)
+
+Amazon TR crawler (Docker, `pnpm crawler:daemon`), created 2026-09-19 through the Proxmox API. Its root disk lives on the 1TB `onetb` storage and it takes its IP from DHCP (currently 192.168.1.106).
+
+```
+hostname: gozcu-crawler
+cores: 4
+memory: 4096
+swap: 512
+rootfs: onetb:106/vm-106-disk-0.raw,size=16G
+net0: name=eth0,bridge=vmbr0,ip=dhcp,type=veth
+features: nesting=1,keyctl=1
+unprivileged: 1
+onboot: 1
+```
+
+---
+
+### 9. Tailscale
 
 ```bash
 curl -fsSL https://tailscale.com/install.sh | sh
@@ -483,14 +601,18 @@ Approve the subnet route in the admin panel. Installing only on the host is suff
 
 ---
 
-### 8. Auto-start
+### 10. Auto-start
 
 ```bash
 pct set 100 --onboot 1 --startup order=1   # Zapret
 pct set 101 --onboot 1 --startup order=2   # Jellyfin
 pct set 102 --onboot 1 --startup order=3   # Arr Stack
-qm set 103 --onboot 1 --startup order=4    # Home Assistant
 pct set 104 --onboot 1 --startup order=5   # Immich
+
+# Start on boot, no explicit order
+qm set 103 --onboot 1                      # Home Assistant
+pct set 105 --onboot 1                     # Apps
+pct set 106 --onboot 1                     # Gözcü crawler
 ```
 
 ---
@@ -539,7 +661,7 @@ pct set 104 --onboot 1 --startup order=5   # Immich
 - [ ] Vaultwarden — Self-hosted password manager
 - [ ] Uptime Kuma — Service monitoring
 - [ ] Watchtower — Docker auto-update
-- [ ] Format 5TB to ext4 — permanently resolves exFAT issues
+- [x] Format 5TB to ext4 — permanently resolves exFAT issues
 - [ ] Expo-like Android aab/apk builder service
 
 ---
@@ -548,9 +670,9 @@ pct set 104 --onboot 1 --startup order=5   # Immich
 
 - This project is for educational purposes
 - All access via LAN + Tailscale VPN
-- **exFAT:** 5TB USB disk — Linux permissions don't work; services that need write access must run on the host
-- **GTX 1050 Ti:** GPU passthrough problematic due to Optimus; reserved for future Ollama use
+- **exFAT (historical):** the 5TB USB disk used to be exFAT, where Linux permissions don't work; it is ext4 now, but the troubleshooting rows about exFAT stay for reference
+- **GTX 1050 Ti:** full GPU passthrough is problematic due to Optimus, but its `/dev/nvidia*` device nodes are bound into Jellyfin LXC 101; Ollama is still planned
 - **Intel HD 630:** Handles 4K→1080p transcoding comfortably via VAAPI
 - Docker IPv6 DNS issue: `daemon.json` DNS override is mandatory in every LXC
 
-*Last updated: April 2026*
+*Last updated: October 2026 (Proxmox state read from the API on 2026-10-14)*
