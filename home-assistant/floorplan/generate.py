@@ -36,7 +36,7 @@ LAMPS = {"mutfak": (855, 245), "salon": (642, 686), "yatak": (335, 1162)}
 LABELS = {"mutfak": (855, 330), "salon": (642, 770), "yatak": (250, 1294)}
 TV = (978, 873)
 # rooms without a light: label only (dimmer pill)
-EXTRA_LABELS = {"depo": (167, 122), "tuvalet": (172, 482), "banyo": (192, 830), "ofis": (1020, 1262), "misafir": (655, 1285)}
+EXTRA_LABELS = {"depo": (167, 122), "tuvalet": (172, 482), "banyo": (192, 830), "ofis": (1020, 1262), "misafir": (655, 1040)}
 FLOOR = {"mutfak": "tile", "salon": "wood", "yatak": "wood"}
 
 BG, ROOM, WALL, WINDOW, DOOR, TEXT = "#12151a", "#1b2027", "#5b6472", "#58b0ff", "#ef6a5b", "#8b95a3"
@@ -115,10 +115,10 @@ def furniture():
     f.append(box(62, 538, 134, 134, rx=10, fill="#1f3a4d", stroke="#2d5a78"))
     f.append(circle(80, 556, 10, fill="#58b0ff", stroke="none", sw=0))
     f.append(circle(150, 620, 11, fill="#14181d"))
-    f.append(box(262, 540, 62, 26, rx=8))
-    f.append(f'<ellipse cx="293" cy="596" rx="26" ry="34" fill="{FURN}" stroke="{FURN_EDGE}" stroke-width="2.5"/>')
-    f.append(box(60, 724, 56, 80, rx=10))
-    f.append(circle(88, 764, 18, fill="#14181d"))
+    f.append(box(262, 540, 64, 54, rx=10))                      # sink (top right)
+    f.append(circle(294, 568, 16, fill="#14181d"))
+    f.append(box(58, 730, 30, 54, rx=8))                        # toilet tank (middle of left wall)
+    f.append(f'<ellipse cx="116" cy="757" rx="34" ry="28" fill="{FURN}" stroke="{FURN_EDGE}" stroke-width="2.5"/>')
     f.append(box(62, 880, 86, 86, rx=10))
     f.append(circle(105, 923, 28, fill="#14181d"))
     f.append(circle(105, 923, 18, fill="#27313c", stroke="#3d4653"))
@@ -130,10 +130,9 @@ def furniture():
     f.append(circle(1190, 958, 26, fill="#26402f", stroke="#2f5a3d"))
     f.append(circle(1190, 958, 12, fill="#2f6b44", stroke="none", sw=0))
     # --- misafir odasi: bed + desk
-    f.append(box(688, 1012, 148, 204, rx=14, fill="#3a4658"))
-    f.append(box(688, 1012, 148, 52, rx=14, fill="#4a586e"))
-    f.append(box(698, 1022, 60, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
-    f.append(box(766, 1022, 60, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(740, 1094, 100, 212, rx=14, fill="#3a4658"))   # single bed, head in the bottom-right corner
+    f.append(box(740, 1258, 100, 48, rx=14, fill="#4a586e"))
+    f.append(box(756, 1266, 68, 32, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
     f.append(box(468, 1110, 72, 150, rx=8))
     f.append(circle(578, 1185, 28, fill="#3a4658"))
     f.append(box(474, 1130, 14, 54, rx=4, fill="#0f1318"))
