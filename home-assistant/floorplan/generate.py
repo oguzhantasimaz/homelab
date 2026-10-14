@@ -32,8 +32,8 @@ WINDOWS = [
     (143, 1323, 327, 1323), (598, 1320, 760, 1320), (1005, 1320, 1145, 1320),
 ]
 # light name -> (x, y) of the lamp icon
-LAMPS = {"mutfak": (855, 245), "salon": (642, 686), "yatak": (223, 1162)}
-LABELS = {"mutfak": (855, 330), "salon": (642, 770), "yatak": (310, 1292)}
+LAMPS = {"mutfak": (855, 245), "salon": (642, 686), "yatak": (335, 1162)}
+LABELS = {"mutfak": (855, 330), "salon": (642, 770), "yatak": (250, 1294)}
 TV = (978, 873)
 # rooms without a light: label only (dimmer pill)
 EXTRA_LABELS = {"depo": (167, 122), "tuvalet": (172, 482), "banyo": (192, 830), "ofis": (1020, 1262), "misafir": (655, 1285)}
@@ -77,24 +77,29 @@ def furniture():
     f.append(box(1110, 54, 98, 82, rx=8, fill="#38414d"))   # fridge
     f.append(box(1010, 240, 150, 120, rx=18))                # dining table
     f += [circle(1085 + dx, 232 if dy < 0 else 368, 17) for dx in (-45, 45) for dy in (-1, 1)]
-    # --- salon: rug, sofa, coffee table, tv unit, armchair, plant
-    f.append(box(790, 600, 380, 250, rx=26, fill="#242b35", stroke="#2f3744", extra='filter="none"'))
-    f.append(box(820, 612, 320, 92, rx=24, fill="#3a4658"))     # sofa
-    f.append(box(820, 612, 320, 30, rx=14, fill="#445168", sw=0))
-    f.append(box(808, 622, 34, 72, rx=14, fill="#445168"))
-    f.append(box(1120, 622, 34, 72, rx=14, fill="#445168"))
-    f.append(box(890, 740, 180, 62, rx=16, fill="#323b47"))     # coffee table
+    # --- salon: rug, sofa along the top wall, tall sofa by the window, coffee table, tv unit, 2 bookshelves, armchair, plant
+    f.append(box(790, 572, 330, 270, rx=26, fill="#242b35", stroke="#2f3744", extra='filter="none"'))
+    f.append(box(800, 462, 300, 92, rx=24, fill="#3a4658"))     # sofa (top wall, faces the TV)
+    f.append(box(800, 462, 300, 30, rx=14, fill="#445168", sw=0))
+    f.append(box(788, 472, 34, 72, rx=14, fill="#445168"))
+    f.append(box(1078, 472, 34, 72, rx=14, fill="#445168"))
+    f.append(box(1146, 590, 66, 230, rx=24, fill="#3a4658"))    # tall sofa by the window
+    f.append(box(1182, 590, 30, 230, rx=14, fill="#445168", sw=0))
+    f.append(box(880, 690, 170, 62, rx=16, fill="#323b47"))     # coffee table
     f.append(box(878, 880, 200, 20, rx=6, fill="#38414d"))      # tv unit
+    f.append(box(684, 872, 90, 30, rx=5, fill="#38414d"))       # bookshelf 1
+    f.append(box(780, 872, 90, 30, rx=5, fill="#38414d"))       # bookshelf 2
+    f += [f'<line x1="{x}" y1="876" x2="{x}" y2="898" stroke="#4b5563" stroke-width="2"/>' for x in (704, 724, 744, 800, 820, 840)]
     f.append(box(488, 490, 92, 92, rx=24, fill="#3a4658"))      # armchair
     f.append(circle(1170, 500, 30, fill="#26402f", stroke="#2f5a3d"))
     f.append(circle(1170, 500, 14, fill="#2f6b44", stroke="none", sw=0))
-    # --- yatak: bed, nightstands, wardrobe
-    f.append(box(60, 1058, 150, 206, rx=14, fill="#3a4658"))
-    f.append(box(60, 1058, 150, 52, rx=14, fill="#4a586e"))
-    f.append(box(72, 1068, 58, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
-    f.append(box(140, 1068, 58, 34, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
-    f.append(box(60, 1016, 50, 36, rx=8))
-    f.append(box(60, 1270, 50, 36, rx=8))
+    # --- yatak: horizontal bed (headboard on the left wall), nightstands, wardrobe
+    f.append(box(60, 1090, 206, 144, rx=14, fill="#3a4658"))
+    f.append(box(60, 1090, 46, 144, rx=14, fill="#4a586e"))
+    f.append(box(76, 1100, 34, 56, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(76, 1168, 34, 56, rx=12, fill="#e9eef5", stroke="none", sw=0, extra='opacity=".85"'))
+    f.append(box(60, 1044, 46, 36, rx=8))
+    f.append(box(60, 1244, 46, 36, rx=8))
     f.append(box(398, 1060, 38, 230, rx=8, fill="#38414d"))
     # --- depo: shelves and boxes
     f.append(box(66, 52, 206, 32, rx=6))

@@ -241,7 +241,7 @@ views:
                 title: Yatak odası
                 tap_action: { action: toggle }
                 hold_action: { action: more-info }
-                style: { top: "82.9%", left: "16.7%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
+                style: { top: "82.9%", left: "25.1%", "--mdc-icon-size": "42px", background: "rgba(14,17,21,.62)", border-radius: "50%", padding: "9px", box-shadow: "0 4px 14px rgba(0,0,0,.5)", backdrop-filter: "blur(4px)" }
               - type: state-icon
                 entity: media_player.glados     # EDIT (or switch./remote.)
                 icon: mdi:television
